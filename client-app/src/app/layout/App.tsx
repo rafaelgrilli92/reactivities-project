@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, SyntheticEvent } from 'react';
 import { Container } from 'semantic-ui-react';
 import { IActivity } from '../models/activity';
 import NavBar from '../../features/nav/NavBar';
@@ -11,6 +11,8 @@ const App = () => {
   const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(null);
   const [enableEditMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [target, setTarget] = useState('');
 
   const handleSelectActivity = (id: string) => {
     setSelectedActivity(activities.find(x => x.id === id) || null);
@@ -23,29 +25,42 @@ const App = () => {
   }
 
   const handleCreateActivity = (activity: IActivity) => {
+    setSubmitting(true);
     agent.Activities.create(activity)
       .then(() => {
         setActivities([...activities, activity])
         setSelectedActivity(activity);
         setEditMode(false);
       })
+      .then(() => {
+        setSubmitting(false)
+      })
   }
 
   const handleUpdateActivity = (activity: IActivity) => {
+    setSubmitting(true);
     agent.Activities.update(activity)
       .then(() => {
         setActivities([...activities.filter(x => x.id !== activity.id), activity])
         setSelectedActivity(activity);
         setEditMode(false);
       })
+      .then(() => {
+        setSubmitting(false)
+      })
   }
 
-  const handleDeleteActivity = (id: string) => {
+  const handleDeleteActivity = (e: SyntheticEvent<HTMLButtonElement>, id: string) => {
+    setSubmitting(true);
+    setTarget(e.currentTarget.name);
     agent.Activities.delete(id)
       .then(() => {
         setActivities([...activities.filter(x => x.id !== id)])
         setSelectedActivity(null);
         setEditMode(false);
+      })
+      .then(() => {
+        setSubmitting(false)
       })
   }
 
@@ -80,6 +95,8 @@ const App = () => {
           updateActivity={handleUpdateActivity}
           deleteActivity={handleDeleteActivity}
           onSelectActivity={handleSelectActivity}
+          submitting={submitting}
+          target={target}
         />
       </Container>
     </Fragment>

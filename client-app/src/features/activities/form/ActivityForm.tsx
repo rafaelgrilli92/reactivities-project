@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react'
+import React, { useState, FormEvent, SyntheticEvent } from 'react'
 import { v4 as uuid } from 'uuid';
 import { Segment, Form, Button } from 'semantic-ui-react'
 import { IActivity } from '../../../app/models/activity'
@@ -8,7 +8,9 @@ interface IProps {
    setEditMode: (enableEditMode: boolean) => void;
    createActivity: (activity: IActivity) => void;
    updateActivity: (activity: IActivity) => void;
-   deleteActivity: (id: string) => void;
+   deleteActivity: (e: SyntheticEvent<HTMLButtonElement>, id: string) => void;
+   submitting: boolean;
+   target: string;
 }
 
 const ActivityForm: React.FC<IProps> = ({
@@ -16,7 +18,9 @@ const ActivityForm: React.FC<IProps> = ({
    setEditMode,
    createActivity,
    updateActivity,
-   deleteActivity
+   deleteActivity,
+   submitting,
+   target
 }) => {
    const initForm = () => {
       if (initialFormState)
@@ -61,12 +65,11 @@ const ActivityForm: React.FC<IProps> = ({
             <Form.Input name="date" type="datetime-local" placeholder="Date" value={activity.date} onChange={handleInputChange} />
             <Form.Input name="city" placeholder="City" value={activity.city} onChange={handleInputChange} />
             <Form.Input name="venue" placeholder="Venue" value={activity.venue} onChange={handleInputChange} />
-            <Button positive type="submit" content="Submit" />
+            <Button loading={submitting} positive type="submit" content="Submit" />
             <Button type="button" floated="right" content="Cancel" onClick={() => setEditMode(false)} />
-            <Button negative type="button" floated="right" content="Delete" onClick={() => deleteActivity(activity.id)} />
          </Form>
       </Segment>
    )
 }
 
-export default ActivityForm
+export default ActivityForm;
