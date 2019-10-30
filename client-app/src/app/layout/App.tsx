@@ -4,11 +4,13 @@ import { IActivity } from '../models/activity';
 import NavBar from '../../features/nav/NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import agent from '../api/agent';
+import Loader from './Loader';
 
 const App = () => {
   const [activities, setActivities] = useState<IActivity[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(null);
   const [enableEditMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleSelectActivity = (id: string) => {
     setSelectedActivity(activities.find(x => x.id === id) || null);
@@ -55,8 +57,14 @@ const App = () => {
           date: activity.date.split('.')[0]
         }));
         setActivities(activities)
-      });
+      })
+      .then(() => {
+        setLoading(false);
+      })
   }, [])
+
+  if (loading)
+    return <Loader content="Loading activities..." />;
 
   return (
     <Fragment>
