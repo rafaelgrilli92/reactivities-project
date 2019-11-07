@@ -1,18 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Card, Image, Button } from 'semantic-ui-react'
-import { IActivity } from '../../../app/models/activity'
+import { observer } from 'mobx-react';
+import ActivityStore from '../../../app/stores/activitiesStore';
 
-interface IProps {
-   activity: IActivity;
-   setEditMode: (enableEditMode: boolean) => void;
-   setSelectedActivity: (activity: IActivity | null) => void;
-}
+const ActivityDetails: React.FC = () => {
+   const { selectedActivity: activity, openEditForm, cancelSelectedActivity } = useContext(ActivityStore);
 
-const ActivityDetails: React.FC<IProps> = ({
-   activity,
-   setEditMode,
-   setSelectedActivity
-}) => {
+   if (!activity)
+      throw new Error('Activity cannot be null');
+
    return (
       <Card fluid>
          <Image src={`/assets/categoryImages/${activity.category}.jpg`} wrapped ui={false} />
@@ -27,12 +23,12 @@ const ActivityDetails: React.FC<IProps> = ({
          </Card.Content>
          <Card.Content extra>
             <Button.Group widths={2}>
-               <Button basic color="blue" content="Edit" onClick={() => setEditMode(true)} />
-               <Button basic color="grey" content="Cancel" onClick={() => setSelectedActivity(null)} />
+               <Button basic color="blue" content="Edit" onClick={() => openEditForm(activity.id)} />
+               <Button basic color="grey" content="Cancel" onClick={cancelSelectedActivity} />
             </Button.Group>
          </Card.Content>
       </Card>
    )
 }
 
-export default ActivityDetails
+export default observer(ActivityDetails);
